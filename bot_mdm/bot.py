@@ -55,7 +55,7 @@ async def get_bicicoruna(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await context.bot.send_message(chat_id=update.effective_chat.id, text="Introduce el nombre de una estacion de bicicoruna")
 
 async def get_list_bikes(update: Update, context: ContextTypes.DEFAULT_TYPE):    
-    await context.bot.send_message(chat_id=update.effective_chat.id, text=list_stations(), parse_mode=ParseMode.MARKDOWN))
+    await context.bot.send_message(chat_id=update.effective_chat.id, text=list_stations(), parse_mode=ParseMode.MARKDOWN)
     
     
 if __name__ == '__main__':

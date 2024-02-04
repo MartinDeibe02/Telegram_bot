@@ -1,9 +1,15 @@
 import datetime
 import requests
+from dotenv import load_dotenv
+import os
+
+
+load_dotenv()
+WEATHER_TOKEN = os.environ.get('WEATHER_TOKEN')
 
 def get_api_weather(city):
     url_openweather = "https://api.openweathermap.org/data/2.5/weather"
-    payload = {'q':city, 'appid': 'token','units': 'metric', 'lang':'es'}
+    payload = {'q':city, 'appid': WEATHER_TOKEN,'units': 'metric', 'lang':'es'}
     response = requests.get(url_openweather, params=payload)
 
     if response.status_code == 200:
