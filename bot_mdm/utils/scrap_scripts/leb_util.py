@@ -1,5 +1,9 @@
 import requests
 from bs4 import BeautifulSoup
+import matplotlib.pyplot as plt
+import pandas as pd
+import io
+
 
 def leb_results():
     url_feb = "https://baloncestoenvivo.feb.es/resultados/ligaleboro/1/2023"
@@ -28,7 +32,7 @@ def leb_results():
     return telegram_message
 
 
-def leb_ladder(soup):
+def leb_ladder():
     url_feb = "https://baloncestoenvivo.feb.es/resultados/ligaleboro/1/2023"
     response = requests.get(url_feb)
     soup = BeautifulSoup(response.text, 'html.parser')
@@ -36,18 +40,33 @@ def leb_ladder(soup):
 
     ladder_list = []
 
-    leb_ladder_keys = ['position', 'team', 'matches_played', 'matches_w', 'matches_l', 'points']
+    leb_ladder_keys = ['POSITION', 'TEAMS', 'MATCHES_PLAYED', 'MATCHES_W', 'MATCHES_L', 'POINTS']
 
     for row in ladder.find_all('tr')[1:]:
         temp_dict = {}
 
         cells = row.find_all(['td', 'th'])
         for key, cell in zip(leb_ladder_keys, cells):
-            if key == 'points':
+            if key == 'POINTS':
                 temp_dict[key] = cells[7].get_text(strip=True) 
             else:
                 temp_dict[key] = cell.get_text(strip=True)
 
         ladder_list.append(temp_dict)
 
-    ladder_list
+    df = pd.DataFrame(ladder_list)
+
+    fig, ax = plt.subplots(figsize=(11, 4))
+    ax.axis('off')
+
+    col_widths = [0.1, 0.4, 0.2, 0.2, 0.2, 0.2]
+
+    ax.table(cellText=df.values, colLabels=df.columns, cellLoc='center', loc='center', colWidths=col_widths)
+
+    image_bytes_io = io.BytesIO()
+    plt.savefig(image_bytes_io, format='png', transparent=True)
+    image_bytes_io.seek(0)
+
+    plt.close()
+
+    return image_bytes_io

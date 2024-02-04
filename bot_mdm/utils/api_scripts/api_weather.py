@@ -1,7 +1,7 @@
 import datetime
 import requests
 
-def get_weather(city):
+def get_api_weather(city):
     url_openweather = "https://api.openweathermap.org/data/2.5/weather"
     payload = {'q':city, 'appid': 'token','units': 'metric', 'lang':'es'}
     response = requests.get(url_openweather, params=payload)
