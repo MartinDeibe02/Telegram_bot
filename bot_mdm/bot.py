@@ -1,8 +1,10 @@
 import logging
 import os
+os.environ['QT_QPA_PLATFORM'] = 'minimal'
+
 from dotenv import load_dotenv
 
-from telegram import Update
+from telegram import Update, InputFile
 from telegram.ext import Updater, filters, MessageHandler, ApplicationBuilder, CommandHandler, ContextTypes, ConversationHandler, CallbackContext
 from telegram.constants import ParseMode
 
@@ -11,8 +13,13 @@ from utils.api_scripts.api_nasa import *
 from utils.api_scripts.api_jokes import *
 from utils.api_scripts.api_bicicoruna import *
 
+
+from utils.scrap_scripts.leb_util import *
+
 load_dotenv()
 BOT_TOKEN = os.environ.get('BOT_TOKEN')
+
+
 
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -57,7 +64,11 @@ async def get_bicicoruna(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def get_list_bikes(update: Update, context: ContextTypes.DEFAULT_TYPE):    
     await context.bot.send_message(chat_id=update.effective_chat.id, text=list_stations(), parse_mode=ParseMode.MARKDOWN)
     
-    
+async def send_ladder_table(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    image_buffer = leb_ladder()
+    await context.bot.send_photo(chat_id=update.effective_chat.id, photo=InputFile(image_buffer, filename='ladder.png'))
+
+
 if __name__ == '__main__':
     application = ApplicationBuilder().token(BOT_TOKEN).build()
     
@@ -81,5 +92,8 @@ if __name__ == '__main__':
     
     bike_list_handler = CommandHandler('lista', get_list_bikes)
     application.add_handler(bike_list_handler)
+
+    leb_ladder_handler = CommandHandler('leb', send_ladder_table)
+    application.add_handler(leb_ladder_handler)
     
     application.run_polling()

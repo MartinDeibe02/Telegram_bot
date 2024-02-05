@@ -63,6 +63,11 @@ def leb_ladder():
 
     ax.table(cellText=df.values, colLabels=df.columns, cellLoc='center', loc='center', colWidths=col_widths)
 
+    ax.text(0.5, -0.1, f"Author: MartinDeibe02", transform=ax.transAxes, ha='center', va='center')
+    ax.set_title("Clasificación de la Liga LEBOro 2023", y=1.05)
+
+
+
     image_bytes_io = io.BytesIO()
     plt.savefig(image_bytes_io, format='png', transparent=True)
     image_bytes_io.seek(0)
