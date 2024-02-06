@@ -3,6 +3,7 @@ import os
 os.environ['QT_QPA_PLATFORM'] = 'minimal'
 
 from dotenv import load_dotenv
+import time
 
 from telegram import Update, InputFile
 from telegram.ext import Updater, filters, MessageHandler, ApplicationBuilder, CommandHandler, ContextTypes, ConversationHandler, CallbackContext
@@ -15,6 +16,7 @@ from utils.api_scripts.api_bicicoruna import *
 
 
 from utils.scrap_scripts.leb_util import *
+from utils.scrap_scripts.scrap_movies import *
 
 load_dotenv()
 BOT_TOKEN = os.environ.get('BOT_TOKEN')
@@ -94,6 +96,11 @@ async def send_matches_table(update: Update, context: ContextTypes.DEFAULT_TYPE)
                                  photo = InputFile(image_buffer, 
                                  filename = 'matches.png'), 
                                  parse_mode = ParseMode.MARKDOWN)
+    
+async def scrap_get_movies(update: Update, context: ContextTypes.DEFAULT_TYPE):    
+    movie_list = get_movies()
+    print(movie_list)
+    
 
 
 if __name__ == '__main__':
@@ -125,5 +132,8 @@ if __name__ == '__main__':
     
     leb_matches_handler = CommandHandler('partidos', send_matches_table)
     application.add_handler(leb_matches_handler)
+    
+    cartelera_handler = CommandHandler('cartelera', scrap_get_movies)
+    application.add_handler(cartelera_handler)
     
     application.run_polling()
