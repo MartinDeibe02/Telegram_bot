@@ -28,45 +28,72 @@ logging.basicConfig(
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.message.from_user
-    await context.bot.send_message(chat_id=update.effective_chat.id, text=f"Binvenido, {user['username']}!😁")
+    await context.bot.send_message(chat_id = update.effective_chat.id, 
+                                   text = f"Binvenido, {user['username']}!😁")
+
 
 async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if context.user_data['status'] == 'waiting_city':
         response = update.message.text
-
-        await context.bot.send_message(chat_id=update.effective_chat.id, text=get_api_weather(response))
+        await context.bot.send_message(chat_id = update.effective_chat.id, 
+                                       text = get_api_weather(response))
         context.user_data['status'] = None
 
     elif context.user_data['status'] == 'waiting_bike':
         response = update.message.text
-
-        await context.bot.send_message(chat_id=update.effective_chat.id, text=get_api_bicicoruna(response), parse_mode=ParseMode.MARKDOWN)
+        await context.bot.send_message(chat_id = update.effective_chat.id, 
+                                       text =  get_api_bicicoruna(response), parse_mode=ParseMode.MARKDOWN)
         context.user_data['status'] = None
         
     else: 
-        await context.bot.send_message(chat_id=update.effective_chat.id, text=update.message.text)
+        await context.bot.send_message(chat_id = update.effective_chat.id, 
+                                       text = update.message.text)
+
 
 async def get_Weather(update: Update, context: ContextTypes.DEFAULT_TYPE):
     context.user_data['status'] = 'waiting_city'
-    await context.bot.send_message(chat_id=update.effective_chat.id, text="De que ciudad quieres saber el tiempo?")
+    
+    await context.bot.send_message(chat_id=update.effective_chat.id, 
+                                   text = "De que ciudad quieres saber el tiempo?")
 
 async def get_apod(update: Update, context: ContextTypes.DEFAULT_TYPE):
     title, description, url = get_api_apod()
-    await context.bot.send_photo(chat_id=update.effective_chat.id, photo=url, caption=f"{title}", parse_mode=ParseMode.MARKDOWN)
+    await context.bot.send_photo(chat_id = update.effective_chat.id, 
+                                 photo = url, 
+                                 caption = f"{title}", 
+                                 parse_mode = ParseMode.MARKDOWN)
 
 async def get_joke(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await context.bot.send_message(chat_id=update.effective_chat.id, text=get_api_joke())
+    await context.bot.send_message(chat_id = update.effective_chat.id, 
+                                   text = get_api_joke())
 
 async def get_bicicoruna(update: Update, context: ContextTypes.DEFAULT_TYPE):    
     context.user_data['status'] = 'waiting_bike'
-    await context.bot.send_message(chat_id=update.effective_chat.id, text="Introduce el nombre de una estacion de bicicoruna")
+    await context.bot.send_message(chat_id = update.effective_chat.id, 
+                                   text = "Introduce el nombre de una estacion de bicicoruna")
 
 async def get_list_bikes(update: Update, context: ContextTypes.DEFAULT_TYPE):    
-    await context.bot.send_message(chat_id=update.effective_chat.id, text=list_stations(), parse_mode=ParseMode.MARKDOWN)
+    await context.bot.send_message(chat_id = update.effective_chat.id, 
+                                   text = list_stations(), 
+                                   parse_mode = ParseMode.MARKDOWN)
+    
     
 async def send_ladder_table(update: Update, context: ContextTypes.DEFAULT_TYPE):
     image_buffer = leb_ladder()
-    await context.bot.send_photo(chat_id=update.effective_chat.id, photo=InputFile(image_buffer, filename='ladder.png'))
+    await context.bot.send_photo(chat_id = update.effective_chat.id, 
+                                 caption = f"*🏀Clasificación LEBOro 2024🏀*", 
+                                 photo = InputFile(image_buffer, 
+                                 filename = 'ladder.png'), 
+                                 parse_mode = ParseMode.MARKDOWN)
+
+
+async def send_matches_table(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    image_buffer = leb_results()
+    await context.bot.send_photo(chat_id = update.effective_chat.id, 
+                                 caption = f"*Últimos partidos LEBOro 2024🏀*", 
+                                 photo = InputFile(image_buffer, 
+                                 filename = 'matches.png'), 
+                                 parse_mode = ParseMode.MARKDOWN)
 
 
 if __name__ == '__main__':
@@ -93,7 +120,10 @@ if __name__ == '__main__':
     bike_list_handler = CommandHandler('lista', get_list_bikes)
     application.add_handler(bike_list_handler)
 
-    leb_ladder_handler = CommandHandler('leb', send_ladder_table)
+    leb_ladder_handler = CommandHandler('clasificacion', send_ladder_table)
     application.add_handler(leb_ladder_handler)
+    
+    leb_matches_handler = CommandHandler('partidos', send_matches_table)
+    application.add_handler(leb_matches_handler)
     
     application.run_polling()

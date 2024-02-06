@@ -5,17 +5,20 @@ import pandas as pd
 import io
 
 
-def leb_results():
+def get_html_content():
     url_feb = "https://baloncestoenvivo.feb.es/resultados/ligaleboro/1/2023"
     response = requests.get(url_feb)
     soup = BeautifulSoup(response.text, 'html.parser')
+    return soup
+
+def leb_results():
+    soup = get_html_content()
 
     table = soup.find(id="_ctl0_MainContentPlaceHolderMaster_jornadaDataGrid")
 
     match_list = []
-    leb_match_keys = ['teams', 'result', 'date', 'time']
+    leb_match_keys = ['TEAMS', 'RESULT', 'DATE', 'TIME']
 
-    # Iterar filas ignorando la primera
     for fila in table.find_all('tr')[1:]:
         temp_dict = {}
         
@@ -24,18 +27,36 @@ def leb_results():
         
         match_list.append(temp_dict)
 
-    telegram_message = ""
-    for match in match_list:
-        telegram_message += f"*Equipos:* {match['teams']}\n"
-        telegram_message += f"*Resultado:* {match['result']}\n"
-        telegram_message += f"*Fecha:* {match['date']} {match['time']}\n\n"
-    return telegram_message
+    df = pd.DataFrame(match_list)
+    fig, ax = plt.subplots(figsize = (8, 1))
+
+    ax.axis('off')
+    colors = ['lightgray', 'white']
+    cell_colors = [[colors[i % 2] for _ in range(len(df.columns))] for i in range(len(df))]
+    
+    col_widths = [0.5, 0.1, 0.1, 0.1]
+
+    ax.table(cellText = df.values, 
+             colLabels = df.columns, 
+             cellLoc = 'center', 
+             loc = 'center',
+             cellColours = cell_colors, 
+             colWidths = col_widths)
+    fig.set_size_inches(10, 2)
+
+    image_bytes_io = io.BytesIO()
+    plt.savefig(image_bytes_io, 
+                format='png', 
+                transparent = True, 
+                bbox_inches = 'tight')
+    image_bytes_io.seek(0)
+    plt.close()
+
+    return image_bytes_io
 
 
 def leb_ladder():
-    url_feb = "https://baloncestoenvivo.feb.es/resultados/ligaleboro/1/2023"
-    response = requests.get(url_feb)
-    soup = BeautifulSoup(response.text, 'html.parser')
+    soup = get_html_content()
     ladder = soup.find(id="_ctl0_MainContentPlaceHolderMaster_clasificacionDataGrid")
 
     ladder_list = []
@@ -56,22 +77,29 @@ def leb_ladder():
 
     df = pd.DataFrame(ladder_list)
 
-    fig, ax = plt.subplots(figsize=(11, 4))
+
+    fig, ax = plt.subplots(figsize = (11, 3))
     ax.axis('off')
 
     col_widths = [0.1, 0.4, 0.2, 0.2, 0.2, 0.2]
+    colors = ['lightgray', 'white']
+    cell_colors = [[colors[i % 2] for _ in range(len(df.columns))] for i in range(len(df))]
+    
+    ax.table(cellText = df.values, 
+             colLabels = df.columns, 
+             cellLoc = 'center', 
+             loc = 'center', 
+             colWidths = col_widths, 
+             cellColours = cell_colors)
 
-    ax.table(cellText=df.values, colLabels=df.columns, cellLoc='center', loc='center', colWidths=col_widths)
-
-    ax.text(0.5, -0.1, f"Author: MartinDeibe02", transform=ax.transAxes, ha='center', va='center')
-    ax.set_title("Clasificación de la Liga LEBOro 2023", y=1.05)
-
-
+    fig.set_size_inches(12, 6)
 
     image_bytes_io = io.BytesIO()
-    plt.savefig(image_bytes_io, format='png', transparent=True)
+    plt.savefig(image_bytes_io, 
+                format = 'png', 
+                transparent = True, 
+                bbox_inches = 'tight')
     image_bytes_io.seek(0)
-
     plt.close()
 
     return image_bytes_io
