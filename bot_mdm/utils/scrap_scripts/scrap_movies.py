@@ -3,20 +3,39 @@ from bs4 import BeautifulSoup
 
 
 def get_movies():
-    url_movies = "https://www.sensacine.com/cines/cine/E0770/"
+    url_movies = "https://www.imdb.com/showtimes/cinema/ES/ci17723570/ES/15368"
     response = requests.get(url_movies)
     soup = BeautifulSoup(response.text, 'html.parser')
 
-    movie_keys = ['title','synopsis', 'image', 'link_ref']
+    movie_keys = ['Titulo', 'Estreno', 'Duracion', 'Genero', 'UserRating', 'Rank', 'Horas']
 
     list_movies = [
-        {
-            movie_keys[0]: movie.find(class_="meta-title-link").text,
-            movie_keys[1]: movie.find(class_="synopsis").text.replace("\n", ""),
-            movie_keys[2]: movie.find("img").get("src") if movie.find("img").get("src").startswith("https") else movie.find("img").get("data-src"),
-            movie_keys[3]: "https://www.sensacine.com" + movie.find(class_="meta-title-link").get("href")
-        }
-        for movie in soup.find_all(class_="movie-card-theater")]
+            {
+                movie_keys[0]: movie.find("h3").get_text(strip = True)[:-7],
+                movie_keys[1]: movie.find("h3").get_text(strip = True)[-6:],
+                movie_keys[2]: movie.find(class_ = "cert-runtime-genre").find("time").text,
+                movie_keys[3]: movie.find(class_ = "cert-runtime-genre").get_text(strip = True).split("\n")[1],
+                movie_keys[4]: ' '.join(movie.find(class_ = "rating_txt").get_text(strip = True).split(" ")[:2]),
+                movie_keys[5]: movie.find_all(class_ = "nobr")[-1].get_text(strip = True),
+                movie_keys[6]: movie.find(class_="showtimes").get_text(strip = True).split("|"),
+            }
+            for movie in soup.findAll(True, {'class':['list_item odd', 'list_item even']})
+    ]
 
-    return list_movies
+    resultado = ''
+    list_movies_sorted = sorted(list_movies, key=lambda x: float(x['UserRating'].split(":")[1].split("/")[0]), reverse=True)
+
+    top_5_movies = list_movies_sorted[:5]
+
+    for movie_data in top_5_movies:
+        formatted_movie = f'''
+🎬 *Titulo:* {movie_data['Titulo']} {movie_data['Estreno']}
+⌛ *Duracion:* {movie_data['Duracion']}
+🌐 *Ranking:* {movie_data['Rank'].split(":")[1]}
+🌟 *UserRating:* {movie_data['UserRating'].split(":")[1]}
+⏰ *Sesiones:* {' | '.join(movie_data['Horas'])}
+        '''
+        resultado += formatted_movie
+
+    return resultado
 

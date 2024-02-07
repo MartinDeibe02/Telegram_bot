@@ -101,7 +101,9 @@ async def send_matches_table(update: Update, context: ContextTypes.DEFAULT_TYPE)
     
 async def scrap_get_movies(update: Update, context: ContextTypes.DEFAULT_TYPE):    
     movie_list = get_movies()
-    print(movie_list)
+    await context.bot.send_message(chat_id = update.effective_chat.id, 
+                                   text = movie_list, 
+                                   parse_mode = ParseMode.MARKDOWN)
     
 
 
