@@ -3,10 +3,9 @@ import os
 os.environ['QT_QPA_PLATFORM'] = 'minimal'
 
 from dotenv import load_dotenv
-import time
 
 from telegram import Update, InputFile
-from telegram.ext import Updater, filters, MessageHandler, ApplicationBuilder, CommandHandler, ContextTypes, ConversationHandler, CallbackContext
+from telegram.ext import Updater, filters, MessageHandler, ApplicationBuilder, CommandHandler, ContextTypes
 from telegram.constants import ParseMode
 
 from utils.api_scripts.api_weather import *
@@ -81,6 +80,9 @@ async def get_list_bikes(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     
 async def send_ladder_table(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await context.bot.send_message(chat_id = update.effective_chat.id, 
+                                   text = "Recuperando datos...", 
+                                   parse_mode = ParseMode.MARKDOWN)
     image_buffer = leb_ladder()
     await context.bot.send_photo(chat_id = update.effective_chat.id, 
                                  caption = f"*🏀Clasificación LEBOro 2024🏀*", 
