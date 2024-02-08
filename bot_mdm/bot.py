@@ -16,6 +16,7 @@ from utils.api_scripts.api_bicicoruna import *
 
 from utils.scrap_scripts.leb_util import *
 from utils.scrap_scripts.scrap_movies import *
+from utils.scrap_scripts.scrap_news import *
 
 load_dotenv()
 BOT_TOKEN = os.environ.get('BOT_TOKEN')
@@ -105,6 +106,11 @@ async def scrap_get_movies(update: Update, context: ContextTypes.DEFAULT_TYPE):
                                    text = movie_list, 
                                    parse_mode = ParseMode.MARKDOWN)
     
+async def scrap_get_news(update: Update, context: ContextTypes.DEFAULT_TYPE):    
+    news_list = get_news()
+    await context.bot.send_message(chat_id = update.effective_chat.id, 
+                                   text = news_list, 
+                                   parse_mode = ParseMode.MARKDOWN)
 
 
 if __name__ == '__main__':
@@ -139,5 +145,8 @@ if __name__ == '__main__':
     
     cartelera_handler = CommandHandler('cartelera', scrap_get_movies)
     application.add_handler(cartelera_handler)
+    
+    news_handler = CommandHandler('noticias', scrap_get_news)
+    application.add_handler(news_handler)
     
     application.run_polling()

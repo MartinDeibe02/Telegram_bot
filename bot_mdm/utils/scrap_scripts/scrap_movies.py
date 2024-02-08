@@ -36,7 +36,7 @@ def get_movies():
 🎬 *Titulo:* [{movie_data['Titulo']}]({movie_data['link']}) {movie_data['Estreno']}
 ⌛ *Duracion:* {movie_data['Duracion']}
 🌐 *Ranking:* {movie_data['Rank'].split(":")[1]}
-🌟 *UserRating:* {movie_data['UserRating'].split(":")[1]}
+🌟 *Valoracion usuarios:* {movie_data['UserRating'].split(":")[1]}
 ⏰ *Sesiones:* {' | '.join(movie_data['Horas'])}
         '''
         resultado += formatted_movie
