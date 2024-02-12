@@ -20,9 +20,10 @@ def get_api_weather(city):
 
         temp, temp_max, temp_min, temp_feel, humidity = weather_data['temp'], weather_data['temp_max'], weather_data['temp_min'], weather_data['feels_like'], weather_data['humidity']
         sunset, sunrise = datetime.datetime.fromtimestamp(sys_data['sunset']), datetime.datetime.fromtimestamp(sys_data['sunrise'])
+        country = sys_data['country']
         
         weather_info = f"""
-    ☁️ Clima en {city}:
+    ☁️ Clima en {city} ({country}):
         - Temperatura: {temp}°C 🌡️
         - Temperatura Máxima: {temp_max}°C 🔥
         - Temperatura Mínima: {temp_min}°C ❄️
