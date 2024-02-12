@@ -32,7 +32,7 @@ def get_movies():
     top_5_movies = list_movies_sorted[:5]
 
     for movie_data in top_5_movies:
-        formatted_movie = f'''
+        formatted_movie = f'''🎬*CARTELERA*🎬
 🎬 *Titulo:* [{movie_data['Titulo']}]({movie_data['link']}) {movie_data['Estreno']}
 ⌛ *Duracion:* {movie_data['Duracion']}
 🌐 *Ranking:* {movie_data['Rank'].split(":")[1]}

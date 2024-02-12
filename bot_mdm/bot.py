@@ -4,7 +4,7 @@ os.environ['QT_QPA_PLATFORM'] = 'minimal'
 from dotenv import load_dotenv
 
 from telegram import Update, InputFile
-from telegram.ext import Updater, filters, MessageHandler, ApplicationBuilder, CommandHandler, ContextTypes
+from telegram.ext import filters, MessageHandler, ApplicationBuilder, CommandHandler, ContextTypes
 from telegram.constants import ParseMode
 
 from utils.api_scripts.api_weather import *
@@ -17,6 +17,9 @@ from utils.scrap_scripts.leb_util import *
 from utils.scrap_scripts.scrap_movies import *
 from utils.scrap_scripts.scrap_news import *
 from utils.file_scripts.csv_json import *
+
+from utils.bbdd_scripts.bd_query import *
+
 
 load_dotenv()
 BOT_TOKEN = os.environ.get('BOT_TOKEN')
@@ -50,6 +53,13 @@ async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await context.bot.send_message(chat_id = update.effective_chat.id, 
                                        text =  get_api_bicicoruna(response), parse_mode=ParseMode.MARKDOWN)
         context.user_data['status'] = None
+    
+    elif context.user_data['status'] == 'waiting_inf':
+        response = update.message.text
+        await context.bot.send_message(chat_id = update.effective_chat.id, 
+                                       text =  get_inf_lvl(response), parse_mode=ParseMode.MARKDOWN)
+        context.user_data['status'] = None
+
                 
 
 
@@ -162,6 +172,14 @@ async def file_test(update, context):
         os.remove(ruta)
 
 
+async def get_inferno(update: Update, context: ContextTypes.DEFAULT_TYPE):    
+    context.user_data['status'] = 'waiting_inf'
+
+    await context.bot.send_message(chat_id = update.effective_chat.id, 
+                                   text = "Introduce un nombre para comrobar si esta en el infierno", 
+                                   parse_mode = ParseMode.MARKDOWN)
+
+
 
 if __name__ == '__main__':
     application = ApplicationBuilder().token(BOT_TOKEN).build()
@@ -199,6 +217,8 @@ if __name__ == '__main__':
     news_handler = CommandHandler('noticias', scrap_get_news)
     application.add_handler(news_handler)
     
+    inf_handler = CommandHandler('infierno', get_inferno)
+    application.add_handler(inf_handler)
     
     application.add_handler(MessageHandler(filters.Document.ALL, file_test))
     application.run_polling()
