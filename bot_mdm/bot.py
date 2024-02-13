@@ -1,26 +1,41 @@
 import logging
 import os
-os.environ['QT_QPA_PLATFORM'] = 'minimal'
+
+#* Librerías externas
 from dotenv import load_dotenv
 
+#* Telegram
 from telegram import Update, InputFile
-from telegram.ext import filters, MessageHandler, ApplicationBuilder, CommandHandler, ContextTypes
+from telegram.ext import (
+    filters, 
+    MessageHandler, 
+    ApplicationBuilder, 
+    CommandHandler, 
+    ContextTypes,
+    CallbackQueryHandler
+)
 from telegram.constants import ParseMode
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
+#* Scripts de API
 from utils.api_scripts.api_weather import *
 from utils.api_scripts.api_nasa import *
 from utils.api_scripts.api_jokes import *
 from utils.api_scripts.api_bicicoruna import *
 
-
+#* Scripts de scraping
 from utils.scrap_scripts.leb_util import *
 from utils.scrap_scripts.scrap_movies import *
 from utils.scrap_scripts.scrap_news import *
+
+#* Scripts de archivos
 from utils.file_scripts.csv_json import *
 
+#* Scripts de base de datos
 from utils.bbdd_scripts.bd_query import *
 
 
+os.environ['QT_QPA_PLATFORM'] = 'minimal'
 load_dotenv()
 BOT_TOKEN = os.environ.get('BOT_TOKEN')
 
@@ -34,8 +49,7 @@ logging.basicConfig(
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.message.from_user
     await context.bot.send_message(chat_id = update.effective_chat.id, 
-                                   text = f"Binvenido, {user['username']}!😁")
-
+                                   text = f"Bienvenido, {user['username']}!😁")
 
 async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not context.user_data :
@@ -60,9 +74,8 @@ async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE):
                                        text =  get_inf_lvl(response), parse_mode=ParseMode.MARKDOWN)
         context.user_data['status'] = None
 
-                
 
-
+# * API            
 async def get_Weather(update: Update, context: ContextTypes.DEFAULT_TYPE):
     context.user_data['status'] = 'waiting_city'
     
@@ -91,6 +104,8 @@ async def get_list_bikes(update: Update, context: ContextTypes.DEFAULT_TYPE):
                                    parse_mode = ParseMode.MARKDOWN)
     
     
+    
+# * SCRAPING 
 async def send_ladder_table(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await context.bot.send_message(chat_id = update.effective_chat.id, 
                                    text = "Recuperando datos...", 
@@ -101,7 +116,6 @@ async def send_ladder_table(update: Update, context: ContextTypes.DEFAULT_TYPE):
                                  photo = InputFile(image_buffer, 
                                  filename = 'ladder.png'), 
                                  parse_mode = ParseMode.MARKDOWN)
-
 
 async def send_matches_table(update: Update, context: ContextTypes.DEFAULT_TYPE):
     image_buffer = leb_results()
@@ -124,7 +138,8 @@ async def scrap_get_news(update: Update, context: ContextTypes.DEFAULT_TYPE):
                                    parse_mode = ParseMode.MARKDOWN)
 
 
-async def file_test(update, context):
+# * FILE
+async def converter(update, context):
     file = await context.bot.get_file(update.message.document)
     filename = update.message.document.file_name
     
@@ -171,13 +186,48 @@ async def file_test(update, context):
                                    parse_mode = ParseMode.MARKDOWN)
         os.remove(ruta)
 
-
+# * DATABASE
 async def get_inferno(update: Update, context: ContextTypes.DEFAULT_TYPE):    
     context.user_data['status'] = 'waiting_inf'
 
     await context.bot.send_message(chat_id = update.effective_chat.id, 
                                    text = "Introduce un nombre para comrobar si esta en el infierno", 
                                    parse_mode = ParseMode.MARKDOWN)
+
+
+# * BOTONES
+async def leb_options(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    keyboard = [
+        [InlineKeyboardButton("Clasificación", callback_data='ladder'),
+        InlineKeyboardButton("Partidos", callback_data='matches')],
+    ]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    
+    await context.bot.send_message(chat_id=update.effective_chat.id, 
+                                  text="🏀 Que quieres consultar?:",
+                                  reply_markup=reply_markup)
+    
+async def bicicoruna_options(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    keyboard = [
+        [InlineKeyboardButton("Consultar parada", callback_data='consult'),
+        InlineKeyboardButton("Listar paradas", callback_data='list')],
+    ]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    
+    await context.bot.send_message(chat_id=update.effective_chat.id, 
+                                  text="🚲 Que quieres consultar?:",
+                                  reply_markup=reply_markup)
+
+async def on_callback_query(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    if query.data == 'ladder':
+        await send_ladder_table(update, context)
+    elif query.data == 'matches':
+        await send_matches_table(update, context)
+    elif query.data == 'consult':
+        await get_bicicoruna(update, context)
+    elif query.data == 'list':
+        await get_list_bikes(update, context)
 
 
 
@@ -196,20 +246,8 @@ if __name__ == '__main__':
     apod_handler = CommandHandler('apod', get_apod)
     application.add_handler(apod_handler)
     
-    joke_handler = CommandHandler('joke', get_joke)
+    joke_handler = CommandHandler('broma', get_joke)
     application.add_handler(joke_handler)
-    
-    bicicoruna_handler = CommandHandler('bicicoruna', get_bicicoruna)
-    application.add_handler(bicicoruna_handler)
-    
-    bike_list_handler = CommandHandler('lista', get_list_bikes)
-    application.add_handler(bike_list_handler)
-
-    leb_ladder_handler = CommandHandler('clasificacion', send_ladder_table)
-    application.add_handler(leb_ladder_handler)
-    
-    leb_matches_handler = CommandHandler('partidos', send_matches_table)
-    application.add_handler(leb_matches_handler)
     
     cartelera_handler = CommandHandler('cartelera', scrap_get_movies)
     application.add_handler(cartelera_handler)
@@ -220,5 +258,14 @@ if __name__ == '__main__':
     inf_handler = CommandHandler('infierno', get_inferno)
     application.add_handler(inf_handler)
     
-    application.add_handler(MessageHandler(filters.Document.ALL, file_test))
+    leb_options_handler = CommandHandler('leb', leb_options)
+    application.add_handler(leb_options_handler)
+    
+    bicicoruna_options_handler = CommandHandler('bicicoruna', bicicoruna_options)
+    application.add_handler(bicicoruna_options_handler)
+    
+    callback_query_handler = CallbackQueryHandler(on_callback_query)
+    application.add_handler(callback_query_handler)
+    
+    application.add_handler(MessageHandler(filters.Document.ALL, converter))
     application.run_polling()
