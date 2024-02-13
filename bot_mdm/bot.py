@@ -39,6 +39,10 @@ os.environ['QT_QPA_PLATFORM'] = 'minimal'
 load_dotenv()
 BOT_TOKEN = os.environ.get('BOT_TOKEN')
 
+if BOT_TOKEN == None:
+    print("Lembra indicar a variable TOKEN")
+    print("p.ex: docker run --rm -e BOT_TOKEN=o_teu_token nomebot")
+    exit(1)
 
 
 logging.basicConfig(
