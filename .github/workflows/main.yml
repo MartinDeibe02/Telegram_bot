@@ -8,9 +8,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    env:
-      WEATHER_TOKEN: ${{ secrets.WEATHER_TOKEN }}
-      NASA_TOKEN: ${{ secrets.NASA_TOKEN }}
     steps:
       -
         name: Checkout
@@ -31,7 +28,4 @@ jobs:
           context: .
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/${{ github.event.repository.name }}:latest
-          build-args: |
-            WEATHER_TOKEN=${WEATHER_TOKEN}
-            NASA_TOKEN=${NASA_TOKEN}
           

@@ -1,13 +1,5 @@
 FROM continuumio/miniconda3
 
-
-ARG WEATHER_TOKEN
-ARG NASA_TOKEN
-
-ENV WEATHER_TOKEN=$WEATHER_TOKEN
-ENV NASA_TOKEN=$NASA_TOKEN
-
-
 WORKDIR /app
 
 COPY bot_mdm/bot.py /app/

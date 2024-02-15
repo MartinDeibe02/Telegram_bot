@@ -27,7 +27,7 @@ def get_movies():
     ]
     
 
-    resultado = '🎬*CARTELERA*🎬'
+    resultado = '🎬*CARTELERA*🎬\n'
     list_movies = list_movies[:5]
 
     for movie_data in list_movies:
