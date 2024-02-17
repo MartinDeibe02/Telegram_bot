@@ -92,6 +92,8 @@ async def get_apod(update: Update, context: ContextTypes.DEFAULT_TYPE):
                                  photo = url, 
                                  caption = f"{title}", 
                                  parse_mode = ParseMode.MARKDOWN)
+    await context.bot.send_message(chat_id = update.effective_chat.id, 
+                                   text = description)
 
 async def get_joke(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await context.bot.send_message(chat_id = update.effective_chat.id, 
@@ -164,6 +166,10 @@ async def converter(update, context):
         else:
             
             await context.bot.send_document(update.effective_chat.id, document=prueba)
+            info = str(info_file(ruta, 'csv'))
+            await context.bot.send_message(chat_id = update.effective_chat.id, 
+                                   text = info, 
+                                   parse_mode = ParseMode.MARKDOWN)
             os.remove(ruta)
             os.remove('data.json') 
         
@@ -180,6 +186,10 @@ async def converter(update, context):
         else:
             
             await context.bot.send_document(update.effective_chat.id, document=prueba)
+            info = str(info_file(ruta, 'json'))
+            await context.bot.send_message(chat_id = update.effective_chat.id, 
+                                   text = info, 
+                                   parse_mode = ParseMode.MARKDOWN)
             os.remove(ruta)
             os.remove('data.csv') 
             

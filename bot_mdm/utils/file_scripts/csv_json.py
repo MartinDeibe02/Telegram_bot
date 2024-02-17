@@ -32,3 +32,22 @@ def convert_file(ruta, conversion):
 
     except Exception as e:
         return None
+    
+def info_file(path, file_type):
+    if file_type == 'csv':
+        df = pd.read_csv(path, encoding="ISO-8859-1")
+
+        with StringIO() as string:
+            df.info(buf=string)
+            info = string.getvalue()
+        
+        return info
+
+    elif file_type == 'json':
+        df = pd.read_json(path, orient="records")
+
+        with StringIO() as string:
+            df.info(buf=string)
+            info = string.getvalue()
+        
+        return info
