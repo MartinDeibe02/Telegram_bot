@@ -45,9 +45,9 @@ Aqui estarán las instrucciones sobre cómo ejecutar el contenedor Docker para e
 El bot responderá a los siguientes comandos:
 
 ### API
-- `/meteo`: Este comando preguntará al usuario por una ciudad y mostrará el tiempo de la ciudad dada
+- `/tiempo`: Este comando preguntará al usuario por una ciudad y mostrará el tiempo de la ciudad dada
 - `/apod`: Este comando devolverá la imagen del día de la nasa junto a su descripción
-- `/joke`: Este comando devolverá un chiste aleatorio
+- `/broma`: Este comando devolverá un chiste aleatorio
 - `/bicicoruna`: Este comando dará dos opciones:
     - **Consultar parada**: Devolverá la información sobre la parada seleccionada.
    - **Listar paradas**: Devolverá una lista de todas las paradas.
