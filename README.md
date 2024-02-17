@@ -9,7 +9,7 @@ Aqui estarán las instrucciones sobre cómo ejecutar el contenedor Docker para e
 2. Utiliza el siguiente comando para ejecutar el contenedor Docker:
 
     ```bash
-    docker run --rm -e BOT_TOKEN=token_bot_telegram WEATHER_TOKEN=token_openweather NASA_TOKEN=token_api_nasa nombre_bot
+    docker run --rm -e BOT_TOKEN=token_bot_telegram -e WEATHER_TOKEN=token_openweather -e NASA_TOKEN=token_api_nasa nombre_imagen
     ```
 
    Asegúrate de reemplazar `BOT_TOKEN`, `WEATHER_TOKEN`, `NASA_TOKEN` con el token que corresponde a cada uno.
