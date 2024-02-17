@@ -40,8 +40,8 @@ load_dotenv()
 BOT_TOKEN = os.environ.get('BOT_TOKEN')
 
 if BOT_TOKEN == None:
-    print("Lembra indicar a variable TOKEN")
-    print("p.ex: docker run --rm -e BOT_TOKEN=o_teu_token nomebot")
+    print("Recuerda indicar las variables")
+    print("p.ej: docker run --rm -e BOT_TOKEN=token_bot_telegram WEATHER_TOKEN=token_openweather NASA_TOKEN=token_api_nasa nombre_bot")
     exit(1)
 
 
